@@ -1,6 +1,5 @@
 package one.genchev.reactivemongo;
 
-import javafx.beans.binding.MapExpression;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -23,7 +22,6 @@ import org.springframework.data.annotation.Id;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 @SpringBootApplication
@@ -41,73 +39,74 @@ public class ReactivemongoApplication {
 @Log4j2
 class ReactiveMongo {
 
-	private final ReservationRepository reservationRepository;
+	private final FruitRepository fruitRepository;
 
 	@EventListener(ApplicationReadyEvent.class)
 	public void init() {
-		var reservationFlux = Flux.just("Apple ", "Orange ", "Grape ", "Banana ", "Strawberry ")
-				.map(name -> new Reservation(null, name))
-				.flatMap(this.reservationRepository::save);
+		var fruitFlux = Flux.just("Apple ", "Orange ", "Grape ", "Banana ", "Strawberry ")
+				.map(name -> new Fruit(null, name))
+				.flatMap(this.fruitRepository::save);
 
-		reservationRepository.deleteAll()
-				.thenMany(reservationFlux)
-				.thenMany(this.reservationRepository.findAll())
+		fruitRepository.deleteAll()
+				.thenMany(fruitFlux)
+				.thenMany(this.fruitRepository.findAll())
 				.subscribe(log::info);
 	}
 }
 
-interface ReservationRepository extends ReactiveCrudRepository<one.genchev.reactivemongo.Reservation, String> {
+interface FruitRepository extends ReactiveCrudRepository<Fruit, String> {
 
 }
 
-@Component
-class IntervalMessageProducer {
-	Flux<GreetingResponse> produce(GreetingRequest name) {
-		return Flux.fromStream(Stream.generate(() -> "Hello " + name.getName() + " @ " + Instant.now()))
-				.map(GreetingResponse::new)
-				.delayElements(Duration.ofSeconds(1));
-	}
-}
+//@Component
+//class IntervalMessageProducer {
+//	Flux<GreetingResponse> produce(GreetingRequest name) {
+//		return Flux.fromStream(Stream.generate(() -> "Hello " + name.getName() + " @ " + Instant.now()))
+//				.map(GreetingResponse::new)
+//				.delayElements(Duration.ofSeconds(1));
+//	}
+//}
 
 @RestController
 @RequiredArgsConstructor
-class ReservationRestController {
-	private final ReservationRepository reservationRepository;
-	private final IntervalMessageProducer intervalMessageProducer;
+class FruitRestController {
+	private final FruitRepository reservationRepository;
+//	private final IntervalMessageProducer intervalMessageProducer;
 
 	@GetMapping("/reservations")
-	Publisher<Reservation> reservationPublisher() {
+	Publisher<Fruit> reservationPublisher() {
 		return reservationRepository.findAll();
 	}
 
-	@GetMapping(produces = MediaType.TEXT_EVENT_STREAM_VALUE, value = "/sse/{n}")
-	Publisher<GreetingResponse > stringPublisher(@PathVariable String n) {
-		return intervalMessageProducer.produce(new GreetingRequest(n));
-	}
+//	@GetMapping(produces = MediaType.TEXT_EVENT_STREAM_VALUE, value = "/sse/{n}")
+//	Publisher<GreetingResponse > stringPublisher(@PathVariable String n) {
+//		return intervalMessageProducer.produce(new GreetingRequest(n));
+//	}
 }
-
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-class GreetingRequest {
-	private String name;
-}
-
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-class GreetingResponse {
-	private String greeting;
-}
-
-
 
 @Data
 @Document
 @AllArgsConstructor
 @NoArgsConstructor
-class Reservation {
+class Fruit {
 	@Id
 	private String id;
 	private String name;
 }
+
+//@Data
+//@NoArgsConstructor
+//@AllArgsConstructor
+//class GreetingRequest {
+//	private String name;
+//}
+//
+//@Data
+//@NoArgsConstructor
+//@AllArgsConstructor
+//class GreetingResponse {
+//	private String greeting;
+//}
+
+
+
