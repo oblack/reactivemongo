@@ -1,5 +1,8 @@
 package one.genchev.reactivemongo;
 
+import io.r2dbc.spi.ConnectionFactory;
+import io.r2dbc.postgresql.PostgresqlConnectionConfiguration;
+import io.r2dbc.postgresql.PostgresqlConnectionFactory;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -8,8 +11,11 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.EventListener;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.r2dbc.config.AbstractR2dbcConfiguration;
+import org.springframework.data.r2dbc.repository.config.EnableR2dbcRepositories;
 import org.springframework.data.repository.reactive.ReactiveCrudRepository;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
@@ -48,22 +54,22 @@ class ReactiveInitializer {
 	}
 }
 
-//@Configuration
-//@EnableR2dbcRepositories
-//class R2dbcConfig extends AbstractR2dbcConfiguration {
-//
-//	@Override
-//	public ConnectionFactory connectionFactory() {
-//		return new PostgresqlConnectionFactory(
-//				PostgresqlConnectionConfiguration.builder()
-//						.username("fruit")
-//						.password("fruit")
-//						.host("localhost")
-//						.database("fruit")
-//						.build()
-//		);
-//	}
-//}
+@Configuration
+@EnableR2dbcRepositories
+class R2dbcConfig extends AbstractR2dbcConfiguration {
+
+	@Override
+	public ConnectionFactory connectionFactory() {
+		return new PostgresqlConnectionFactory(
+				PostgresqlConnectionConfiguration.builder()
+						.username("fruit")
+						.password("fruit")
+						.host("localhost")
+						.database("fruit")
+						.build()
+		);
+	}
+}
 
 interface FruitRepository extends ReactiveCrudRepository<Fruit, Integer> {
 
