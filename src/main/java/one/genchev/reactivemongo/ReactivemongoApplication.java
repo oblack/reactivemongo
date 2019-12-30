@@ -76,6 +76,9 @@ class R2dbcConfig extends AbstractR2dbcConfiguration {
 
 interface FruitRepository extends ReactiveCrudRepository<Fruit, Integer> {
 
+//	@Tailable
+//	Flux<Fruit> findByName(String name);
+
 }
 
 //@Component
