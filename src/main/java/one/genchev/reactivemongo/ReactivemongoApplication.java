@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.reactivestreams.Publisher;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
@@ -18,6 +19,8 @@ import org.springframework.data.r2dbc.config.AbstractR2dbcConfiguration;
 import org.springframework.data.r2dbc.repository.config.EnableR2dbcRepositories;
 import org.springframework.data.repository.reactive.ReactiveCrudRepository;
 import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
 
 @SpringBootApplication
@@ -84,23 +87,23 @@ interface FruitRepository extends ReactiveCrudRepository<Fruit, Integer> {
 //	}
 //}
 
-//@RestController
-//@RequiredArgsConstructor
-//class FruitRestController {
-//
-//	private final FruitRepository fruitRepository;
-////	private final IntervalMessageProducer intervalMessageProducer;
-//
-//	@GetMapping("/fruit")
-//	Publisher<Fruit> fruitPublisher() {
-//		return fruitRepository.findAll();
+@RestController
+@RequiredArgsConstructor
+class FruitRestController {
+
+	private final FruitRepository fruitRepository;
+//	private final IntervalMessageProducer intervalMessageProducer;
+
+	@GetMapping("/fruit")
+	Publisher<Fruit> fruitPublisher() {
+		return fruitRepository.findAll();
+	}
+
+//	@GetMapping(produces = MediaType.TEXT_EVENT_STREAM_VALUE, value = "/sse/{n}")
+//	Publisher<GreetingResponse > stringPublisher(@PathVariable String n) {
+//		return intervalMessageProducer.produce(new GreetingRequest(n));
 //	}
-//
-////	@GetMapping(produces = MediaType.TEXT_EVENT_STREAM_VALUE, value = "/sse/{n}")
-////	Publisher<GreetingResponse > stringPublisher(@PathVariable String n) {
-////		return intervalMessageProducer.produce(new GreetingRequest(n));
-////	}
-//}
+}
 
 @Data
 //@Document
