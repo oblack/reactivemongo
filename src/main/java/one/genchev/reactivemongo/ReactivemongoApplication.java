@@ -1,35 +1,23 @@
 package one.genchev.reactivemongo;
 
-import io.r2dbc.postgresql.PostgresqlConnectionConfiguration;
-import io.r2dbc.postgresql.PostgresqlConnectionFactory;
-import io.r2dbc.spi.ConnectionFactory;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.reactivestreams.Publisher;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.EventListener;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.r2dbc.config.AbstractR2dbcConfiguration;
-import org.springframework.data.r2dbc.repository.config.EnableR2dbcRepositories;
 import org.springframework.data.repository.reactive.ReactiveCrudRepository;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.EnableTransactionManagement;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
 
 @SpringBootApplication
-@EnableTransactionManagement
-@ComponentScan({"one.genchev.reactivemongo"})
-@EntityScan("one.genchev.reactivemongo")
+//@EnableTransactionManagement
+//@ComponentScan({"one.genchev.reactivemongo"})
+//@EntityScan("one.genchev.reactivemongo")
 public class ReactivemongoApplication {
 
 	public static void main(String[] args) {
@@ -52,29 +40,30 @@ class ReactiveInitializer {
 				.map(name -> new Fruit(null, name))
 				.flatMap(this.fruitRepository::save);
 
-		fruitRepository.deleteAll()
+		fruitRepository
+				.deleteAll()
 				.thenMany(fruitFlux)
 				.thenMany(this.fruitRepository.findAll())
 				.subscribe(log::info);
 	}
 }
 
-@Configuration
-@EnableR2dbcRepositories
-class R2dbcConfig extends AbstractR2dbcConfiguration {
-
-	@Override
-	public ConnectionFactory connectionFactory() {
-		return new PostgresqlConnectionFactory(
-				PostgresqlConnectionConfiguration.builder()
-						.username("fruit")
-						.password("fruit")
-						.host("localhost")
-						.database("fruit")
-						.build()
-		);
-	}
-}
+//@Configuration
+//@EnableR2dbcRepositories
+//class R2dbcConfig extends AbstractR2dbcConfiguration {
+//
+//	@Override
+//	public ConnectionFactory connectionFactory() {
+//		return new PostgresqlConnectionFactory(
+//				PostgresqlConnectionConfiguration.builder()
+//						.username("fruit")
+//						.password("fruit")
+//						.host("localhost")
+//						.database("fruit")
+//						.build()
+//		);
+//	}
+//}
 
 interface FruitRepository extends ReactiveCrudRepository<Fruit, Integer> {
 
@@ -89,23 +78,23 @@ interface FruitRepository extends ReactiveCrudRepository<Fruit, Integer> {
 //	}
 //}
 
-@RestController
-@RequiredArgsConstructor
-class FruitRestController {
-
-	private final FruitRepository fruitRepository;
-//	private final IntervalMessageProducer intervalMessageProducer;
-
-	@GetMapping("/fruit")
-	Publisher<Fruit> fruitPublisher() {
-		return fruitRepository.findAll();
-	}
-
-//	@GetMapping(produces = MediaType.TEXT_EVENT_STREAM_VALUE, value = "/sse/{n}")
-//	Publisher<GreetingResponse > stringPublisher(@PathVariable String n) {
-//		return intervalMessageProducer.produce(new GreetingRequest(n));
+//@RestController
+//@RequiredArgsConstructor
+//class FruitRestController {
+//
+//	private final FruitRepository fruitRepository;
+////	private final IntervalMessageProducer intervalMessageProducer;
+//
+//	@GetMapping("/fruit")
+//	Publisher<Fruit> fruitPublisher() {
+//		return fruitRepository.findAll();
 //	}
-}
+//
+////	@GetMapping(produces = MediaType.TEXT_EVENT_STREAM_VALUE, value = "/sse/{n}")
+////	Publisher<GreetingResponse > stringPublisher(@PathVariable String n) {
+////		return intervalMessageProducer.produce(new GreetingRequest(n));
+////	}
+//}
 
 @Data
 //@Document
