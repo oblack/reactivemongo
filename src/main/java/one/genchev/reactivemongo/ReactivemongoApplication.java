@@ -1,8 +1,5 @@
 package one.genchev.reactivemongo;
 
-import io.r2dbc.spi.ConnectionFactory;
-import io.r2dbc.postgresql.PostgresqlConnectionConfiguration;
-import io.r2dbc.postgresql.PostgresqlConnectionFactory;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -12,16 +9,16 @@ import org.reactivestreams.Publisher;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.EventListener;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.r2dbc.config.AbstractR2dbcConfiguration;
-import org.springframework.data.r2dbc.repository.config.EnableR2dbcRepositories;
 import org.springframework.data.repository.reactive.ReactiveCrudRepository;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
+
+import java.time.Duration;
+import java.util.Arrays;
+import java.util.List;
 
 @SpringBootApplication
 //@EnableTransactionManagement
@@ -57,24 +54,24 @@ class ReactiveInitializer {
 	}
 }
 
-@Configuration
-@EnableR2dbcRepositories
-class R2dbcConfig extends AbstractR2dbcConfiguration {
+//@Configuration
+//@EnableR2dbcRepositories
+//class R2dbcConfig extends AbstractR2dbcConfiguration {
+//
+//	@Override
+//	public ConnectionFactory connectionFactory() {
+//		return new PostgresqlConnectionFactory(
+//				PostgresqlConnectionConfiguration.builder()
+//						.username("fruit")
+//						.password("fruit")
+//						.host("localhost")
+//						.database("fruit")
+//						.build()
+//		);
+//	}
+//}
 
-	@Override
-	public ConnectionFactory connectionFactory() {
-		return new PostgresqlConnectionFactory(
-				PostgresqlConnectionConfiguration.builder()
-						.username("fruit")
-						.password("fruit")
-						.host("localhost")
-						.database("fruit")
-						.build()
-		);
-	}
-}
-
-interface FruitRepository extends ReactiveCrudRepository<Fruit, Integer> {
+interface FruitRepository extends ReactiveCrudRepository<Fruit, String> {
 
 //	@Tailable
 //	Flux<Fruit> findByName(String name);
@@ -106,6 +103,16 @@ class FruitRestController {
 //	Publisher<GreetingResponse > stringPublisher(@PathVariable String n) {
 //		return intervalMessageProducer.produce(new GreetingRequest(n));
 //	}
+
+	@GetMapping("/basic")
+	List<String> basicPublisher() {
+		return Arrays.asList("1", "2", "3", "4", "5");
+	}
+
+	@GetMapping("/flux")
+	Publisher<String> fluxPublisher() {
+		return Flux.just("Apple ", "Orange ", "Grape ", "Banana ", "Strawberry ").delayElements(Duration.ofSeconds(2));
+	}
 }
 
 @Data
@@ -113,8 +120,8 @@ class FruitRestController {
 @AllArgsConstructor
 @NoArgsConstructor
 class Fruit {
-	@Id
-	private Integer id;
+//	@Id
+	private String id;
 	private String name;
 }
 
